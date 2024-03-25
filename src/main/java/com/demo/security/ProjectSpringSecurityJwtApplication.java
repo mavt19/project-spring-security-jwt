@@ -31,7 +31,7 @@ public class ProjectSpringSecurityJwtApplication {
 			
 			userRepository.save(new User(null, "jose Tirado", "jose", "jose@gmail.com", encoder.encode("12345"), List.of(roleUser)));
 			userRepository.save(new User(null, "john Travolta", "jhon", "john@gmail.com", encoder.encode("12345"), List.of(roleUser, roleAdmin, roleManager, roleSuperAdmin) ));
-			userRepository.save(new User(null, "Will Smith", "will", "will@gmail.com", encoder.encode("12345"), List.of(roleManager, roleUser) ));
+			userRepository.save(new User(null, "Will Smith", "will", "will@gmail.com", encoder.encode("12345"), List.of(roleManager, roleAdmin) ));
 			userRepository.save(new User(null, "Jim Carry", "jim", "jim@gmail.com", encoder.encode("12345"), List.of(roleUser, roleSuperAdmin) ));
 //		
 //			userService.addRoleToUser("jose", "ROLE_USER");
