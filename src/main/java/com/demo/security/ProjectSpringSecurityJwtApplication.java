@@ -29,10 +29,10 @@ public class ProjectSpringSecurityJwtApplication {
 			var roleManager = roleRepository.save(new Role(null, RoleEnum.ROLE_MANAGER));
 			var roleSuperAdmin = roleRepository.save(new Role(null, RoleEnum.ROLE_SUPER_ADMIN));
 			
-			userRepository.save(new User(null, "jose Tirado", "jose", "jose@gmail.com", encoder.encode("12345"), List.of(roleUser)));
-			userRepository.save(new User(null, "john Travolta", "jhon", "john@gmail.com", encoder.encode("12345"), List.of(roleUser, roleAdmin, roleManager, roleSuperAdmin) ));
-			userRepository.save(new User(null, "Will Smith", "will", "will@gmail.com", encoder.encode("12345"), List.of(roleManager, roleAdmin) ));
-			userRepository.save(new User(null, "Jim Carry", "jim", "jim@gmail.com", encoder.encode("12345"), List.of(roleUser, roleSuperAdmin) ));
+			userRepository.save(new User(null, "jose Tirado", "jose", "jose123", "jose@gmail.com", encoder.encode("12345"), List.of(roleUser)));
+			userRepository.save(new User(null, "john Travolta", "jhon", "jhon123", "john@gmail.com", encoder.encode("12345"), List.of(roleUser, roleAdmin, roleManager, roleSuperAdmin) ));
+			userRepository.save(new User(null, "Will Smith", "will", "will123", "will@gmail.com", encoder.encode("12345"), List.of(roleManager, roleAdmin) ));
+			userRepository.save(new User(null, "Jim Carry", "jim", "jim123", "jim@gmail.com", encoder.encode("12345"), List.of(roleUser, roleSuperAdmin) ));
 //		
 //			userService.addRoleToUser("jose", "ROLE_USER");
 //			userService.addRoleToUser("jose", "ROLE_MANAGER");

@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import com.demo.security.models.domain.Role;
 import com.demo.security.models.domain.User;
 import com.demo.security.models.dto.ReqRes;
+import com.demo.security.models.dto.auth.RefreshTokenRequest;
+import com.demo.security.models.dto.auth.SignInRequest;
+import com.demo.security.models.dto.auth.SignUpRequest;
 import com.demo.security.models.enums.RoleEnum;
 import com.demo.security.repository.RoleRepository;
 import com.demo.security.repository.UserRepository;
@@ -29,12 +32,19 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
-    public ReqRes signUp(ReqRes registrationRequest){
+    public ReqRes signUp(SignUpRequest registrationRequest){
         ReqRes resp = new ReqRes();
         try {
+        	var userFound = userRepository.findByEmailOrUsername(registrationRequest.email(), registrationRequest.username());
+        	if(userFound.isPresent()) {
+        		throw new Exception("User already exists with this email or username");
+        	}
             User ourUsers = new User();
-            ourUsers.setEmail(registrationRequest.getEmail());
-            ourUsers.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
+            ourUsers.setName(registrationRequest.name());
+            ourUsers.setLastname(registrationRequest.lastname());
+            ourUsers.setUsername(registrationRequest.username());
+            ourUsers.setEmail(registrationRequest.email());
+            ourUsers.setPassword(passwordEncoder.encode(registrationRequest.password()));
             Role role = roleRepository.findByRole(RoleEnum.ROLE_USER);
             ourUsers.getRoles().add(role);
             User ourUserResult = userRepository.save(ourUsers);
@@ -50,13 +60,13 @@ public class AuthService {
         return resp;
     }
 
-    public ReqRes signIn(ReqRes signinRequest){
+    public ReqRes signIn(SignInRequest signinRequest){
         ReqRes response = new ReqRes();
 
         try {
-            var res = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signinRequest.getEmail(),signinRequest.getPassword()));
+            var res = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signinRequest.email(),signinRequest.password()));
            System.out.println(res);	
-            var user = userRepository.findByEmail(signinRequest.getEmail()).orElseThrow();
+            var user = userRepository.findByEmail(signinRequest.email()).orElseThrow();
             System.out.println("USER IS: "+ user);
             var jwt = jwtUtils.generateToken(user);
             var refreshToken = jwtUtils.generateRefreshToken(new HashMap<>(), user);
@@ -72,15 +82,15 @@ public class AuthService {
         return response;
     }
 
-    public ReqRes refreshToken(ReqRes refreshTokenReqiest){
+    public ReqRes refreshToken(RefreshTokenRequest refreshTokenReqiest){
         ReqRes response = new ReqRes();
-        String ourEmail = jwtUtils.extractUsername(refreshTokenReqiest.getToken());
+        String ourEmail = jwtUtils.extractUsername(refreshTokenReqiest.refreshToken());
         User users = userRepository.findByEmail(ourEmail).orElseThrow();
-        if (jwtUtils.isTokenValid(refreshTokenReqiest.getToken(), users.getEmail())) {
+        if (jwtUtils.isTokenValid(refreshTokenReqiest.refreshToken(), users.getEmail())) {
             var jwt = jwtUtils.generateToken(users);
             response.setStatusCode(200);
             response.setToken(jwt);
-            response.setRefreshToken(refreshTokenReqiest.getToken());
+            response.setRefreshToken(refreshTokenReqiest.refreshToken());
             response.setExpirationTime("24Hr");
             response.setMessage("Successfully Refreshed Token");
         }

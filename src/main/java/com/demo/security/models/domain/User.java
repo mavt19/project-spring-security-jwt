@@ -3,6 +3,7 @@ package com.demo.security.models.domain;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -24,11 +25,13 @@ public class User {
 	private Long id;
 
 	private String name;
-
-	private String username;
 	
+	private String lastname;
+	@Column(unique = true, nullable = false)
+	private String username;
+	@Column(unique = true, nullable = false)	
 	private String email;
-
+	
 	private String password;
 	
 	@ManyToMany(fetch = FetchType.EAGER)
