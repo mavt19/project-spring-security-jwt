@@ -13,13 +13,15 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import com.demo.security.service.UserService;
+import com.demo.security.service.security.UserService;
 
 @Configuration
 @EnableWebSecurity
@@ -35,11 +37,14 @@ public class SecurityConfig {
     
     @Autowired
     private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    
+    @Autowired
+    private  LogoutHandler logoutHandler;
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(request -> request.requestMatchers("/auth/**", "/public/**", "/h2-ui/**").permitAll()
+                .authorizeHttpRequests(request -> request.requestMatchers("/api/v1/auth/**", "/public/**", "/h2-ui/**").permitAll()
                         .requestMatchers("/admin/**").hasAnyAuthority("ROLE_ADMIN")
                         .requestMatchers("/user/**").hasAnyAuthority("ROLE_USER")
                         .requestMatchers("/adminuser/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
@@ -49,7 +54,11 @@ public class SecurityConfig {
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider()).addFilterBefore(
                         jwtAuthFIlter, UsernamePasswordAuthenticationFilter.class
-                );
+                ).logout(logout ->
+                logout.logoutUrl("/api/v1/auth/logout")
+                .addLogoutHandler(logoutHandler)
+                .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
+);
         return httpSecurity.build();
     }
 

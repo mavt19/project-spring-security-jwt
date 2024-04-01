@@ -1,4 +1,4 @@
-package com.demo.security.service;
+package com.demo.security.service.security;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,7 +31,7 @@ public class UserService implements UserDetailsService{
 		.map(x -> new SimpleGrantedAuthority(x.getRole().getRoleName()))
 		.collect(Collectors.toList());
 		System.out.println(authorities);
-		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
+		return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
 	}
 
 
